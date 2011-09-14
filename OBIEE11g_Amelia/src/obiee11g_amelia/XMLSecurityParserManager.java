@@ -87,7 +87,7 @@ public class XMLSecurityParserManager {
                             || currentAppRole.equals("BIAuthor") || currentAppRole.equals("BIConsumer"))
                         sb.append("#");
                     
-                    sb.append("createAppRole('obi', '").append(currentAppRole).append("')");
+                    sb.append("createAppRole(\"obi\", \"").append(currentAppRole).append("\")");
                     sb.append("\n");
                 }
             }

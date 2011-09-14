@@ -104,8 +104,8 @@ public class OBIEE11g_Amelia {
         
         
         // Connection statement to WLS
-        connectionStatement = "connect('" + wlsUsername + "', '" + wlsPassword
-                + "', '" + wlsServer + ":" + wlsPort + "')";
+        connectionStatement = "connect(\"" + wlsUsername + "\", \"" + wlsPassword
+                + "\", \"" + wlsServer + ":" + wlsPort + "\")";
         sbMainScript.append(connectionStatement);
         sbMainScript.append("\n");
         sbMainScript.append("\n");

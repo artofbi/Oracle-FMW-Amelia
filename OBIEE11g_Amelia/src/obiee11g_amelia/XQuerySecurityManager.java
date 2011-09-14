@@ -101,21 +101,52 @@ public class XQuerySecurityManager {
                     System.out.println("-->" + appRoleMemberName + " (" + appRoleMemberClass + ")");
 
                     //---------------------------------------
-                    // Write out the items to the string
+                    // Comment out what should be the default OBI 11g default installed groups.
+                    // There is no need to re-add these because it will cause a fail message to occur at 
+                    // point of failure.
                     //---------------------------------------
                     if((currentAppRole.equals("BISystem") && appRoleMemberName.equals("BISystemUser")) 
                             || (currentAppRole.equals("BIAdministrator") && appRoleMemberName.equals("BIAdministrators"))
                             || (currentAppRole.equals("BIAuthor") && appRoleMemberName.equals("BIAuthors"))
-                            || (currentAppRole.equals("BIAuthor") && appRoleMemberName.equals("BIAudministrator"))
+                            || (currentAppRole.equals("BIAuthor") && appRoleMemberName.equals("BIAdministrator"))
                             || (currentAppRole.equals("BIConsumer") && appRoleMemberName.equals("BIConsumers"))
                             || (currentAppRole.equals("BIConsumer") && appRoleMemberName.equals("BIAuthor"))
                             || (currentAppRole.equals("BIConsumer") && appRoleMemberName.equals("authenticated-role")))
                         sb.append("#");
                     
-                    sb.append("grantAppRole('obi', '")
-                            .append(currentAppRole).append("', '")
-                            .append(appRoleMemberClass).append("', '")
-                            .append(appRoleMemberName).append("'")
+                    
+                    //---------------------------------------
+                    // Comment out a group class principal addition if the app role name is the same as the group name.
+                    // This happens during an OBI 10g to OBI 11g upgrade because the upgrade utility needs to extract 
+                    // the RPD Groups and place them somewhere. That somewhere is both the App Roles and the LDAP Embedded 
+                    // groups. Since security for the RPD gets reattached from RPD Groups to Application Roles the 
+                    // RPD groups (now WLS LDAP groups) may or may not be needed.  In most cases they are no longer needed as 
+                    // this is really duplication of information and chances are the "groups" are no longer needed. For this case 
+                    // we will comment them out so that when migrated they don't get added to the target environment.  
+                    
+                    // In other cases some groups can actually be mapped to an LDAP system and we want those groups, 
+                    // which used to RPD Groups to come from the Alt. LDAP provider and be linked to an App Role to maintain 
+                    // a centeralized security model.  In this case just uncomment those groups from the PRoject Amelia 
+                    // generated script and you'll be fine.  Either, way you at least have a scripted inventory of what 
+                    // app roles and app role principal mappings are coming from one system (possibly a OBI 10g to 11g upgrade),
+                    // source in order to be moved to a potential target system.
+                    // 
+                    //---------------------------------------
+                    if(currentAppRole.equals(appRoleMemberName) 
+                            && appRoleMemberClass.equals("weblogic.security.principal.WLSGroupImpl"))
+                    {
+                        sb.append("### Group Dup ###");
+                    }
+                    
+                    
+                    
+                    //---------------------------------------
+                    // Write out the commands to the string
+                    //---------------------------------------
+                    sb.append("grantAppRole(\"obi\", \"")
+                            .append(currentAppRole).append("\", \"")
+                            .append(appRoleMemberClass).append("\", \"")
+                            .append(appRoleMemberName).append("\"")
                             .append(")");
                     sb.append("\n");
                 }
