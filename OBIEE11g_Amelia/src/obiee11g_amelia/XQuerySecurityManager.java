@@ -106,7 +106,9 @@ public class XQuerySecurityManager {
                     if((currentAppRole.equals("BISystem") && appRoleMemberName.equals("BISystemUser")) 
                             || (currentAppRole.equals("BIAdministrator") && appRoleMemberName.equals("BIAdministrators"))
                             || (currentAppRole.equals("BIAuthor") && appRoleMemberName.equals("BIAuthors"))
+                            || (currentAppRole.equals("BIAuthor") && appRoleMemberName.equals("BIAudministrator"))
                             || (currentAppRole.equals("BIConsumer") && appRoleMemberName.equals("BIConsumers"))
+                            || (currentAppRole.equals("BIConsumer") && appRoleMemberName.equals("BIAuthor"))
                             || (currentAppRole.equals("BIConsumer") && appRoleMemberName.equals("authenticated-role")))
                         sb.append("#");
                     
