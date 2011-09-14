@@ -25,7 +25,10 @@ Note:   All arguments must be entered for argument 1 & 2.  Arguments 3 - 6 speci
 Example:
 java -jar OBIEE11g_Amelia.jar "C:\Stage_Files\system-jazn-data.xml" "C:\Stage_Files\" weblogic Admin123 myserver 7001
 
+
+********
 Note:   Some OS's require that the output file path in argument 2 be written like "C:/Stage_Files/" using forward slashes.
+********
 
 
 Remember:   The credentials entered in the command-line arguments are those used for the environment to which you are migrating, the target environment. 
