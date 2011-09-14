@@ -1,5 +1,7 @@
 ===================================================
 READ ME
+Version : 0.99
+Last Modified : September 13, 2011
 ===================================================
 
 This JAR file can be used in Windows and *Nix environments.
@@ -13,7 +15,7 @@ Locate the system-jazn-data.xml file which is normally located,
 
 
 Execute the script from the standard command line (not WLST - not yet!)
-java -jar OBIEE11g_Amelia.jar "C:\_DevNetBeans\_Stage_Files\system-jazn-data.xml" "C:\_DevNetBeans\_Stage_Files\" 
+java -jar OBIEE11g_Amelia.jar "C:\Stage_Files\system-jazn-data.xml" "C:\Stage_Files\" 
 
 Note:   The file name in argument 1 need not matter.
 Note:   Argument 2 is the output directory for the generated helper script.  It must contain a trailing slash
@@ -21,8 +23,9 @@ Note:   Argument 2 is the output directory for the generated helper script.  It 
 Note:   All arguments must be entered for argument 1 & 2.  Arguments 3 - 6 specify username, password, wls server, and wls port
 
 Example:
-java -jar OBIEE11g_Amelia.jar "C:\_DevNetBeans\_Stage_Files\system-jazn-data.xml" "C:\_DevNetBeans\_Stage_Files\" weblogic Admin123 myserver 7001
+java -jar OBIEE11g_Amelia.jar "C:\Stage_Files\system-jazn-data.xml" "C:\Stage_Files\" weblogic Admin123 myserver 7001
 
+Note:   Some OS's require that the output file path in argument 2 be written like "C:/Stage_Files/" using forward slashes.
 
 
 Remember:   The credentials entered in the command-line arguments are those used for the environment to which you are migrating, the target environment. 
