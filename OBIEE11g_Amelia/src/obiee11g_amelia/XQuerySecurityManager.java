@@ -49,9 +49,13 @@ public class XQuerySecurityManager {
         fullPathJAZNFile = fileLocation;
     }
     
-    public String buildWLSTSecurityAppRoleMemberScript() throws ParserConfigurationException, SAXException,
+    public String buildWLSTSecurityAppRoleMemberScript(boolean isDeleteScript) throws ParserConfigurationException, SAXException,
             IOException, XPathExpressionException {
 
+        String strRoleGrantCommand = "grantAppRole";
+        
+        if(isDeleteScript)
+            strRoleGrantCommand = "revokeAppRole";
 
         StringBuilder sb = new StringBuilder();
 
@@ -155,7 +159,8 @@ public class XQuerySecurityManager {
                     //---------------------------------------
                     // Write out the commands to the string
                     //---------------------------------------
-                    sb.append("grantAppRole(\"obi\", \"")
+                    sb.append(strRoleGrantCommand)  // revokeAppRole or grantAppRole
+                            .append("(\"obi\", \"")
                             .append(currentAppRole).append("\", \"")
                             .append(appRoleMemberClass).append("\", \"")
                             .append(appRoleMemberName).append("\"")

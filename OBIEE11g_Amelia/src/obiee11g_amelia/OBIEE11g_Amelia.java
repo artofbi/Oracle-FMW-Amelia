@@ -31,10 +31,14 @@ import java.util.Date;
 public class OBIEE11g_Amelia {
 
     private static final String OUTPUT_HELPER_SCRIPT_NAME = "OBI11gSecurityMigration.py";
+    private static final String OUTPUT_HELPER_SCRIPT_PREFIX = "OBI11gSecurityMigration_";
+    private static final String OUTPUT_HELPER_SCRIPT_SUFFIX = ".py";
     public static StringBuilder sbMainScript = new StringBuilder();
     private static String fullFilePath, outputDirPath;
     private static String wlsUsername, wlsPassword, wlsServer, wlsPort;
     
+    private boolean bCreateDeleteScript = true;
+
     /**
      * @param args the command line arguments
      */
@@ -49,6 +53,9 @@ public class OBIEE11g_Amelia {
         System.out.println("===================================================");
         System.out.println("");
         
+        
+        if(args == null)
+            System.out.println("This program requires a minimum of two arguments!");
         
         fullFilePath = args[0].toString();
         outputDirPath = args[1].toString();
@@ -87,11 +94,22 @@ public class OBIEE11g_Amelia {
                 wlsPort = args[5].toString();
         
             goGoGadget();
+            
+            // A reset for the stringbuilder object
+            sbMainScript = new StringBuilder();
+            
+            goGoGadget_delete();
         }
 
     }
     
     public static void goGoGadget(){
+        
+                
+        // Function Mode
+        String scriptPurpose = "Create";
+        boolean isToCreateDeleteScript = false;
+        
         // get arguments required
         
         
@@ -124,7 +142,7 @@ public class OBIEE11g_Amelia {
         
         // call parse manager main function to rip and hold app roles
         XMLSecurityParserManager oXSPM = new XMLSecurityParserManager(fullFilePath);
-        sbMainScript.append(oXSPM.listAppRoles());
+        sbMainScript.append(oXSPM.listAppRoles(isToCreateDeleteScript));
         
         
         
@@ -133,7 +151,7 @@ public class OBIEE11g_Amelia {
         try {
             
             // call core script to get grant role statements
-            sbMainScript.append(oXQSM.buildWLSTSecurityAppRoleMemberScript());
+            sbMainScript.append(oXQSM.buildWLSTSecurityAppRoleMemberScript(isToCreateDeleteScript));
             
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(OBIEE11g_Amelia.class.getName()).log(Level.SEVERE, null, ex);
@@ -195,4 +213,133 @@ public class OBIEE11g_Amelia {
         System.out.println("Thank you for your support.  Please visit http://www.artofbi.com");
         System.out.println("-------------------------------------------------------------------");
     }
+
+
+    public static void goGoGadget_delete(){
+        
+        // Function Mode
+        String scriptPurpose = "Delete";
+        boolean isToCreateDeleteScript = true;
+        
+        // get arguments required
+        
+        
+        //...testing..
+        //fullFilePath = "C:\\_DevNetBeans\\system-jazn-data.xml";
+        
+        
+        // Variables
+        Date scriptStartTS = new Date();
+        String connectionStatement = null;
+        
+
+        
+        
+        //-------------------------------------------------
+        // Script Connect
+        //-------------------------------------------------
+        
+        // begin a exception wrapper
+        sbMainScript.append("#try:");
+        sbMainScript.append("\n");
+        
+        
+        // Connection statement to WLS
+        connectionStatement = "connect(\"" + wlsUsername + "\", \"" + wlsPassword
+                + "\", \"" + wlsServer + ":" + wlsPort + "\")";
+        sbMainScript.append(connectionStatement);
+        sbMainScript.append("\n");
+        sbMainScript.append("\n");
+        
+        
+        
+        
+        
+        // --------------------- IMPORTANT NOTE -----------------------------
+        // The calls below are in an inverse order from the create and grant
+        // scripting declarations. An AppRole must be revoke all grants before 
+        // the AppRole itself can be delete.  This just makes sense, right?
+        
+        // Create object which will loop through the app-roles and members
+        XQuerySecurityManager oXQSM = new XQuerySecurityManager(fullFilePath);
+        try {
+            
+            // call core script to get grant role statements
+            sbMainScript.append(oXQSM.buildWLSTSecurityAppRoleMemberScript(isToCreateDeleteScript));
+            
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(OBIEE11g_Amelia.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SAXException ex) {
+            Logger.getLogger(OBIEE11g_Amelia.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(OBIEE11g_Amelia.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (XPathExpressionException ex) {
+            Logger.getLogger(OBIEE11g_Amelia.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        
+        
+        // call parse manager main function to rip and hold app roles
+        XMLSecurityParserManager oXSPM = new XMLSecurityParserManager(fullFilePath);
+        sbMainScript.append(oXSPM.listAppRoles(isToCreateDeleteScript));
+        
+        
+        
+
+        
+        
+                    
+        //----------------------------------
+        // Build the PY Script for WLST
+        //----------------------------------
+
+        // finish the exception wrap
+        sbMainScript.append("\n");
+        sbMainScript.append("#finally:");
+        sbMainScript.append("\n");
+        sbMainScript.append("#disconnect()");
+        
+        
+        //HelperFunctions.writeStringToTextFile("C:\\_DevNetBeans\\OBI11gSecurityMigration.py", sbMainScript.toString());
+        HelperFunctions.writeStringToTextFile(outputDirPath 
+                + OUTPUT_HELPER_SCRIPT_PREFIX + "delete" + OUTPUT_HELPER_SCRIPT_SUFFIX
+                , sbMainScript.toString());
+
+        
+        
+        //----------------------------------
+        
+        
+        
+        //----------------------------------
+        // Disply Status Report of Script to stdOut
+        //----------------------------------
+        Date scriptFinishTS = new Date();
+        System.out.println();
+        System.out.println();
+        System.out.println("---------------------------------------------------");
+        System.out.println("Status of Security Migration Script Builder");
+        System.out.println("---------------------------------------------------");
+        
+        // math for difference in time for script start to finsih
+        long scriptTimeLapse = (scriptFinishTS.getTime() - scriptStartTS.getTime());
+        
+        System.out.println("Script Execution Time : " +  String.valueOf(scriptTimeLapse) + " milliseconds" );
+        System.out.println("File output to : " + (outputDirPath + OUTPUT_HELPER_SCRIPT_NAME));
+        System.out.println("JAZN File Used : " + fullFilePath);
+        System.out.println("Connection String : " + connectionStatement);
+        
+        
+        //----------------------------------
+        // Shameless self-promotion plug
+        //----------------------------------
+        System.out.println();
+        System.out.println();
+        System.out.println("-------------------------------------------------------------------");
+        System.out.println("Thank you for your support.  Please visit http://www.artofbi.com");
+        System.out.println("-------------------------------------------------------------------");
+    }
+
+
 }

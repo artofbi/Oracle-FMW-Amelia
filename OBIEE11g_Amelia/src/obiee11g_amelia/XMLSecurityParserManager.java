@@ -59,7 +59,7 @@ public class XMLSecurityParserManager {
     }
     
     
-    public String listAppRoles() {
+    public String listAppRoles(boolean isDeleteScript) {
         
         StringBuilder sb = new StringBuilder();
         
@@ -99,7 +99,11 @@ public class XMLSecurityParserManager {
                             || currentAppRole.equals("BIAuthor") || currentAppRole.equals("BIConsumer"))
                         sb.append("#");
                     
-                    sb.append("createAppRole(\"obi\", \"").append(currentAppRole).append("\")");
+                    if(!isDeleteScript)
+                        sb.append("createAppRole(\"obi\", \"").append(currentAppRole).append("\")");
+                    else
+                        sb.append("deleteAppRole(\"obi\", \"").append(currentAppRole).append("\")");
+                    
                     sb.append("\n");
                 }
             }
